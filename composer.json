@@ -1,0 +1,43 @@
+{
+    "description": "masterclass-repo",
+    "license": "private",
+    "type": "project",
+    "require": {
+        "php": ">=5.5.9"
+    },
+    "require-dev": {
+        "fzaninotto/faker": "~1.4",
+        "mockery/mockery": "0.9.*",
+        "phpunit/phpunit": "~4.0",
+        "phpspec/phpspec": "~2.1",
+        "laravel/homestead": "^3.0"
+    },
+    "autoload": {
+        "classmap": [
+        ],
+        "psr-4": {
+
+        }
+    },
+    "autoload-dev": {
+        "classmap": [
+
+        ]
+    },
+    "scripts": {
+        "post-install-cmd": [
+        ],
+        "pre-update-cmd": [
+        ],
+        "post-update-cmd": [
+        ],
+        "post-root-package-install": [
+        ],
+        "post-create-project-cmd": [
+        ]
+    },
+    "config": {
+        "preferred-install": "dist",
+        "bin-dir": "bin"
+    }
+}

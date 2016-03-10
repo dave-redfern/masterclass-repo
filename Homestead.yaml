@@ -1,0 +1,36 @@
+---
+ip: "192.168.101.100"
+memory: 2048
+cpus: 1
+hostname: masterclass
+name: masterclass
+provider: virtualbox
+
+authorize: ~/.ssh/id_rsa.pub
+
+keys:
+    - ~/.ssh/id_rsa
+
+folders:
+    - map: "/Users/dave/Projects/masterclass-repo"
+      to: "/home/vagrant/masterclass-repo"
+
+sites:
+    - map: masterclass.app
+      to: "/home/vagrant/masterclass-repo/public"
+
+databases:
+    - masterclass
+
+# blackfire:
+#     - id: foo
+#       token: bar
+#       client-id: foo
+#       client-token: bar
+
+ports:
+    - send: 33606
+      to: 3306
+#     - send: 7777
+#       to: 777
+#       protocol: udp
