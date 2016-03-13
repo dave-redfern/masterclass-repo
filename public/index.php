@@ -1,14 +1,12 @@
 <?php
 
+use App\MasterController;
+
 session_start();
 
-$config = require_once('../config.php');
-require_once '../MasterController.php';
+require_once('../vendor/autoload.php');
+require_once('../config/diconfig.php');
 
-require_once '../Comment.php';
-require_once '../User.php';
-require_once '../Story.php';
-require_once '../Index.php';
-
-$framework = new MasterController($config);
-echo $framework->execute();
+$request   = App\Request::newFromGlobals();
+$framework = new MasterController($di);
+echo $framework->execute($request);
