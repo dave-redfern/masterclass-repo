@@ -2,10 +2,13 @@
 
 namespace App\Controllers;
 
+use App\Entities\Story;
 use App\Repositories\CommentRepository;
 use App\Repositories\StoryRepository;
-use App\Request;
-use PDO;
+use App\Services\Auth\Authenticator;
+use App\Services\Factory\EntityFactory;
+use App\Support\Http\Request;
+use App\Support\Traits\Controller\Authenticatable;
 
 /**
  * Class StoryController
@@ -13,8 +16,10 @@ use PDO;
  * @package    App\Controllers
  * @subpackage App\Controllers\StoryController
  */
-class StoryController
+class StoryController extends BaseController
 {
+
+    use Authenticatable;
 
     /**
      * @var StoryRepository
@@ -29,28 +34,32 @@ class StoryController
     /**
      * Constructor.
      *
+     * @param Authenticator     $auth
      * @param StoryRepository   $stories
      * @param CommentRepository $comments
      */
-    public function __construct(StoryRepository $stories, CommentRepository $comments)
+    public function __construct(Authenticator $auth, StoryRepository $stories, CommentRepository $comments)
     {
+        $this->auth     = $auth;
         $this->stories  = $stories;
         $this->comments = $comments;
     }
 
+    /**
+     * @param Request $request
+     */
     public function index(Request $request)
     {
         if (!$id = $request->getQuery()->get('id')) {
-            header("Location: /");
-            exit;
+            $this->redirect('/');
         }
+        /** @var Story $story */
         if (null === $story = $this->stories->find($id)) {
-            header("Location: /");
-            exit;
+            $this->redirect('/');
         }
 
         $comment_count = $this->comments->countForStory($story);
-        $comments      = $this->comments->findBy(['story_id' => $story->getId()], ['created_on' => 'ASC']);
+        $comments      = $this->comments->findForStory($story);
 
         $content = '
             <a class="headline" href="' . $story->getUrl() . '">' . $story->getHeadline() . '</a><br />
@@ -58,7 +67,7 @@ class StoryController
             ' . $story->getCreatedOn()->format('n/j/Y g:i a') . '</span>
         ';
 
-        if (isset($_SESSION['AUTHENTICATED'])) {
+        if ($this->auth->user()) {
             $content .= '
             <form method="post" action="/comment/create">
             <input type="hidden" name="story_id" value="' . $story->getId() . '" />
@@ -80,31 +89,27 @@ class StoryController
 
     }
 
-    public function create()
+    /**
+     * @param EntityFactory $factory
+     * @param Request       $request
+     */
+    public function create(EntityFactory $factory, Request $request)
     {
-        if (!isset($_SESSION['AUTHENTICATED'])) {
-            header("Location: /user/login");
-            exit;
-        }
+        $this->isAuthenticated();
 
         $error = '';
-        if (isset($_POST['create'])) {
-            if (!isset($_POST['headline']) || !isset($_POST['url']) ||
-                !filter_input(INPUT_POST, 'url', FILTER_VALIDATE_URL)
+
+        if ($request->input('create')) {
+            if (!$request->input('headline') || !$request->input('url') ||
+                !filter_var($request->input('url'), FILTER_VALIDATE_URL)
             ) {
                 $error = 'You did not fill in all the fields or the URL did not validate.';
             } else {
-                $sql  = 'INSERT INTO story (headline, url, created_by, created_on) VALUES (?, ?, ?, NOW())';
-                $stmt = $this->db->prepare($sql);
-                $stmt->execute([
-                    $_POST['headline'],
-                    $_POST['url'],
-                    $_SESSION['username'],
-                ]);
+                $story = $factory->createStory($request->input('headline'), $request->input('url'));
 
-                $id = $this->db->lastInsertId();
-                header("Location: /story/?id=$id");
-                exit;
+                $this->stories->getPersister()->save($story);
+
+                $this->redirect('/story/?id=' . $story->getId());
             }
         }
 

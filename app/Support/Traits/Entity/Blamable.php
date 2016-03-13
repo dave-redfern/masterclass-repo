@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Entities\Traits;
+namespace App\Support\Traits\Entity;
 
 /**
  * Trait Blamable
  *
- * @package    App\Entities\Traits
- * @subpackage App\Entities\Traits\Blamable
+ * @package    App\Support\Traits\Entity
+ * @subpackage App\Support\Traits\Entity\Blamable
  */
 trait Blamable
 {

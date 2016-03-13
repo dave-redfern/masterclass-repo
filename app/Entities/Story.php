@@ -2,9 +2,8 @@
 
 namespace App\Entities;
 
-use App\Entities\Traits\Blamable;
-use App\Entities\Traits\Identifiable;
-use App\Entities\Traits\Timestampable;
+use App\Contracts\Entity\Trackable as TrackableContract;
+use App\Support\Traits\Entity\Trackable;
 
 /**
  * Class Story
@@ -12,12 +11,10 @@ use App\Entities\Traits\Timestampable;
  * @package    App\Entities
  * @subpackage App\Entities\Story
  */
-class Story
+class Story implements TrackableContract
 {
 
-    use Identifiable;
-    use Blamable;
-    use Timestampable;
+    use Trackable;
 
     /**
      * @var string

@@ -2,9 +2,8 @@
 
 namespace App\Entities;
 
-use App\Entities\Traits\Blamable;
-use App\Entities\Traits\Identifiable;
-use App\Entities\Traits\Timestampable;
+use App\Contracts\Entity\Trackable as TrackableContract;
+use App\Support\Traits\Entity\Trackable;
 
 /**
  * Class Comment
@@ -12,12 +11,10 @@ use App\Entities\Traits\Timestampable;
  * @package    App\Entities
  * @subpackage App\Entities\Comment
  */
-class Comment
+class Comment implements TrackableContract
 {
 
-    use Identifiable;
-    use Blamable;
-    use Timestampable;
+    use Trackable;
 
     /**
      * @var string
@@ -34,12 +31,14 @@ class Comment
     /**
      * Constructor.
      *
+     * @param null|Story  $story
      * @param null|string $comment
      * @param null|string $createdBy
      * @param null|string $createdOn
      */
-    public function __construct($comment = null, $createdBy = null, $createdOn = null)
+    public function __construct(Story $story = null, $comment = null, $createdBy = null, $createdOn = null)
     {
+        $this->story      = $story;
         $this->comment    = $comment;
         $this->created_by = $createdBy;
         $this->created_on = $createdOn;

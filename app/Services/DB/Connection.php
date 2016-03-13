@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Support;
+namespace App\Services\DB;
 
 use App\Services\Config\Config;
 use PDO;
@@ -8,8 +8,8 @@ use PDO;
 /**
  * Class Connection
  *
- * @package    App\Support
- * @subpackage App\Support\Connection
+ * @package    App\Services\DB
+ * @subpackage App\Services\DB\Connection
  */
 class Connection
 {

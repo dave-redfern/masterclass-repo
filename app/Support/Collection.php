@@ -18,6 +18,8 @@ class Collection implements \IteratorAggregate, \ArrayAccess, \Countable
      */
     protected $collection;
 
+
+
     /**
      * Constructor.
      *
@@ -34,6 +36,18 @@ class Collection implements \IteratorAggregate, \ArrayAccess, \Countable
     public function toArray()
     {
         return $this->collection;
+    }
+
+    /**
+     * Removes all entries from the collection
+     *
+     * @return $this
+     */
+    public function clear()
+    {
+        $this->collection = [];
+
+        return $this;
     }
 
     /**
@@ -110,6 +124,20 @@ class Collection implements \IteratorAggregate, \ArrayAccess, \Countable
     }
 
     /**
+     * Appends without key to the collection
+     *
+     * @param mixed $value
+     *
+     * @return $this
+     */
+    public function add($value)
+    {
+        $this->collection[] = $value;
+
+        return $this;
+    }
+
+    /**
      * @param string $name
      * @param null   $default
      *
@@ -122,6 +150,16 @@ class Collection implements \IteratorAggregate, \ArrayAccess, \Countable
         }
 
         return $default;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function has($name)
+    {
+        return $this->offsetExists($name);
     }
 
     /**

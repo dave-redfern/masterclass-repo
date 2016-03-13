@@ -2,7 +2,8 @@
 
 namespace App\Entities;
 
-use App\Entities\Traits\Identifiable;
+use App\Contracts\Entity\Identifiable as IdentifiableContract;
+use App\Support\Traits\Entity\Identifiable;
 
 /**
  * Class User
@@ -10,7 +11,7 @@ use App\Entities\Traits\Identifiable;
  * @package    App\Entities
  * @subpackage App\Entities\User
  */
-class User
+class User implements IdentifiableContract
 {
 
     use Identifiable;

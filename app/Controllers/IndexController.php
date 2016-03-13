@@ -11,7 +11,7 @@ use App\Repositories\StoryRepository;
  * @package    App\Controllers
  * @subpackage App\Controllers\IndexController
  */
-class IndexController
+class IndexController extends BaseController
 {
 
     /**

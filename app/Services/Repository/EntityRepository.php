@@ -1,25 +1,31 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Services\Repository;
 
 use App\Services\Config\Config;
+use App\Services\DB\Connection;
+use App\Services\Persister\PersisterInterface;
 use App\Support\Collection;
-use App\Support\Connection;
 use PDO;
 
 /**
  * Class EntityRepository
  *
- * @package    App\Repositories
- * @subpackage App\Repositories\EntityRepository
+ * @package    App\Services\Repository
+ * @subpackage App\Services\Repository\EntityRepository
  */
-class EntityRepository
+abstract class EntityRepository implements RepositoryInterface
 {
 
     /**
      * @var Connection
      */
     protected $connection;
+
+    /**
+     * @var PersisterInterface
+     */
+    protected $persister;
 
     /**
      * @var Config
@@ -32,16 +38,19 @@ class EntityRepository
     protected $entityName;
 
 
+
     /**
      * Constructor.
      *
-     * @param Connection $connection
-     * @param Config     $config
-     * @param string     $entity
+     * @param Connection         $connection
+     * @param PersisterInterface $persister
+     * @param Config             $config
+     * @param                    $entity
      */
-    public function __construct(Connection $connection, Config $config, $entity)
+    public function __construct(Connection $connection, PersisterInterface $persister, Config $config, $entity)
     {
         $this->connection = $connection;
+        $this->persister  = $persister;
         $this->config     = $config;
         $this->entityName = $entity;
     }
@@ -52,6 +61,14 @@ class EntityRepository
     public function getEntityName()
     {
         return $this->entityName;
+    }
+
+    /**
+     * @return PersisterInterface
+     */
+    public function getPersister()
+    {
+        return $this->persister;
     }
 
     /**
@@ -136,7 +153,7 @@ class EntityRepository
      *
      * @return Collection
      */
-    public function findBy(array $where, array $orderBy, $offset = null, $limit = null)
+    public function findBy(array $where, array $orderBy = [], $offset = null, $limit = null)
     {
         $parameters = [];
         $query      = sprintf('SELECT * FROM %s', $this->getMappedTable());
@@ -183,14 +200,12 @@ class EntityRepository
     /**
      * @param array    $where
      * @param array    $orderBy
-     * @param null|int $offset
-     * @param null|int $limit
      *
      * @return null|object
      */
-    public function findOneBy(array $where, array $orderBy, $offset = null, $limit = null)
+    public function findOneBy(array $where, array $orderBy = [])
     {
-        if (false !== $result = $this->findBy($where, $orderBy, 0, 1)->first()) {
+        if (null !== $result = $this->findBy($where, $orderBy, 0, 1)->first()) {
             return $result;
         }
 

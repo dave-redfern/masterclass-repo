@@ -1,5 +1,7 @@
 <?php
 
+$namespace = 'App\\Controllers\\';
+
 return array(
 
     'database' => array(
@@ -8,15 +10,25 @@ return array(
         'host' => '',
         'name' => '',
     ),
-    
-    'routes' => array(
-        '' => 'index/index',
-        'story' => 'story/index',
-        'story/create' => 'story/create',
-        'comment/create' => 'comment/create',
-        'user/create' => 'user/create',
-        'user/account' => 'user/account',
-        'user/login' => 'user/login',
-        'user/logout' => 'user/logout',
-    ),
+
+    'routes' => [
+        ['path' => '/',               'type' => 'GET',  'handler' => $namespace . 'IndexController@index'],
+        ['path' => '/story/',         'type' => 'GET',  'handler' => $namespace . 'StoryController@index'],
+        ['path' => '/story/create',   'type' => 'GET',  'handler' => $namespace . 'StoryController@create'],
+        ['path' => '/story/create',   'type' => 'POST', 'handler' => $namespace . 'StoryController@create'],
+        ['path' => '/comment/create', 'type' => 'POST', 'handler' => $namespace . 'CommentController@create'],
+        ['path' => '/user/create',    'type' => 'GET',  'handler' => $namespace . 'UserController@create'],
+        ['path' => '/user/create',    'type' => 'POST', 'handler' => $namespace . 'UserController@create'],
+        ['path' => '/user/account',   'type' => 'GET',  'handler' => $namespace . 'UserController@account'],
+        ['path' => '/user/account',   'type' => 'POST', 'handler' => $namespace . 'UserController@account'],
+        ['path' => '/user/login',     'type' => 'GET',  'handler' => $namespace . 'UserController@login'],
+        ['path' => '/user/login',     'type' => 'POST', 'handler' => $namespace . 'UserController@login'],
+        ['path' => '/user/logout',    'type' => 'GET',  'handler' => $namespace . 'UserController@logout'],
+    ],
+
+    'mappings' => [
+        App\Entities\Comment::class => 'comment',
+        App\Entities\Story::class   => 'story',
+        App\Entities\User::class    => 'user',
+    ],
 );

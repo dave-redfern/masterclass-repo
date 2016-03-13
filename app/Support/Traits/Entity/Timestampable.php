@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Entities\Traits;
+namespace App\Support\Traits\Entity;
 
 /**
  * Trait Timestampable
  *
- * @package    App\Entities\Traits
- * @subpackage App\Entities\Traits\Timestampable
+ * @package    App\Support\Traits\Entity
+ * @subpackage App\Support\Traits\Entity\Timestampable
  */
 trait Timestampable
 {

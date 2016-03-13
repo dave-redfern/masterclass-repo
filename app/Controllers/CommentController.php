@@ -2,8 +2,13 @@
 
 namespace App\Controllers;
 
+use App\Entities\Story;
 use App\Repositories\CommentRepository;
-use PDO;
+use App\Repositories\StoryRepository;
+use App\Services\Auth\Authenticator;
+use App\Services\Factory\EntityFactory;
+use App\Support\Http\Request;
+use App\Support\Traits\Controller\Authenticatable;
 
 /**
  * Class CommentController
@@ -11,35 +16,62 @@ use PDO;
  * @package    App\Controllers
  * @subpackage App\Controllers\CommentController
  */
-class CommentController
+class CommentController extends BaseController
 {
+
+    use Authenticatable;
+
+    /**
+     * @var Authenticator
+     */
+    protected $auth;
+
+    /**
+     * @var StoryRepository
+     */
+    protected $stories;
+
+    /**
+     * @var CommentRepository
+     */
+    protected $comments;
 
     /**
      * Constructor.
      *
+     * @param Authenticator     $auth
+     * @param StoryRepository   $stories
      * @param CommentRepository $comments
      */
-    public function __construct(CommentRepository $comments)
+    public function __construct(Authenticator $auth, StoryRepository $stories, CommentRepository $comments)
     {
+        $this->auth     = $auth;
+        $this->stories  = $stories;
         $this->comments = $comments;
     }
 
-    public function create()
+    /**
+     * @param EntityFactory $factory
+     * @param Request       $request
+     *
+     * @return void
+     */
+    public function create(EntityFactory $factory, Request $request)
     {
-        if (!isset($_SESSION['AUTHENTICATED'])) {
-            die('not auth');
-            header("Location: /");
-            exit;
+        $this->isAuthenticated();
+
+        /** @var Story $story */
+        if (null === $story = $this->stories->find($request->input('story_id'))) {
+            $this->redirect('/');
+        }
+        if (!$request->input('comment')) {
+            $this->redirect('/story/?id=' . $story->getId());
         }
 
-        $sql  = 'INSERT INTO comment (created_by, created_on, story_id, comment) VALUES (?, NOW(), ?, ?)';
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            $_SESSION['username'],
-            $_POST['story_id'],
-            filter_input(INPUT_POST, 'comment', FILTER_SANITIZE_FULL_SPECIAL_CHARS),
-        ]);
-        header("Location: /story/?id=" . $_POST['story_id']);
-    }
+        $comment = $factory->createComment($story, $request->input('comment'));
 
+        $this->comments->getPersister()->save($comment);
+
+        $this->redirect('/story/?id=' . $story->getId());
+    }
 }
