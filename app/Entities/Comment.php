@@ -32,6 +32,20 @@ class Comment
 
 
     /**
+     * Constructor.
+     *
+     * @param null|string $comment
+     * @param null|string $createdBy
+     * @param null|string $createdOn
+     */
+    public function __construct($comment = null, $createdBy = null, $createdOn = null)
+    {
+        $this->comment    = $comment;
+        $this->created_by = $createdBy;
+        $this->created_on = $createdOn;
+    }
+
+    /**
      * @return string
      */
     public function getComment()

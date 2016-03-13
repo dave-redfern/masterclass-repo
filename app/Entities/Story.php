@@ -32,6 +32,20 @@ class Story
 
 
     /**
+     * Constructor.
+     *
+     * @param string $headline
+     * @param string $url
+     */
+    public function __construct($headline = null, $url = null, $createdBy = null, $createdOn = null)
+    {
+        $this->headline   = $headline;
+        $this->url        = $url;
+        $this->created_by = $createdBy;
+        $this->created_on = $createdOn;
+    }
+
+    /**
      * @return string
      */
     public function getHeadline()

@@ -33,6 +33,20 @@ class User
 
 
     /**
+     * Constructor.
+     *
+     * @param null|string $username
+     * @param null|string $email
+     * @param null|string $password
+     */
+    public function __construct($username = null, $email = null, $password = null)
+    {
+        $this->username = $username;
+        $this->email    = $email;
+        $this->password = $password;
+    }
+
+    /**
      * @return string
      */
     public function getUsername()

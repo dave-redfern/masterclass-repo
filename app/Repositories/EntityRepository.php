@@ -100,10 +100,11 @@ class EntityRepository
                 $this->getMappedTable()
             )
         );
+        $stmt->setFetchMode(PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE, $this->getEntityName());
         $stmt->bindValue(':id', $id);
         $stmt->execute();
 
-        if (false !== $object = $stmt->fetchObject($this->getEntityName())) {
+        if (false !== $object = $stmt->fetch()) {
             return $object;
         }
 
