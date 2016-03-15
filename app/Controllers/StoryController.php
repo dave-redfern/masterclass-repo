@@ -55,11 +55,11 @@ class StoryController extends BaseController
     public function index(Request $request)
     {
         if (!$id = $request->getQuery()->get('id')) {
-            $this->redirect('/');
+            return $this->redirect('/');
         }
         /** @var Story $story */
         if (null === $story = $this->stories->find($id)) {
-            $this->redirect('/');
+            return $this->redirect('/');
         }
 
         $comments = $this->comments->findForStory($story);

@@ -1,0 +1,11 @@
+{% extends 'layouts/layout.twig' %}
+
+{% block content %}
+
+    <p>Error at line {{ e.line }} in {{ e.file }}:</p>
+    <p>{{ e.message }}</p>
+
+    <p>
+        {{ e.traceAsString|nl2br }}
+    </p>
+{% endblock %}

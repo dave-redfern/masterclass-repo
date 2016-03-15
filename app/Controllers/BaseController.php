@@ -4,6 +4,8 @@ namespace App\Controllers;
 
 use App\Contracts\Controllers\ContainerAware as ContainerAwareContract;
 use App\Support\Traits\Controller\ContainerAware;
+use App\Support\Traits\Controller\CreateResponse;
+use App\Support\Traits\Controller\RenderView;
 use Aura\Web\Response;
 
 /**
@@ -16,35 +18,8 @@ abstract class BaseController implements ContainerAwareContract
 {
 
     use ContainerAware;
-
-    /**
-     * @return Response
-     */
-    protected function response()
-    {
-        return $this->get('response');
-    }
-
-    /**
-     * Renders the template, returning the content
-     *
-     * @param string $template
-     * @param array  $data
-     *
-     * @return Response
-     */
-    protected function view($template, array $data = [])
-    {
-        $result = $this->get('view')->render($template, $data);
-
-        $response = $this->response();
-        $response->content->set($result);
-        $response->content->setCharset('utf8');
-        $response->content->setType('text/html');
-        $response->status->setCode(200);
-
-        return $response;
-    }
+    use CreateResponse;
+    use RenderView;
 
     /**
      * Redirect to a given path

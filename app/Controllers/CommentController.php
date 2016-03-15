@@ -64,7 +64,7 @@ class CommentController extends BaseController
 
         /** @var Story $story */
         if (null === $story = $this->stories->find($request->input('story_id'))) {
-            $this->redirect('/');
+            return $this->redirect('/');
         }
 
         $comment   = $factory->createComment($story, $request->input('comment'));

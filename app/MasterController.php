@@ -2,10 +2,13 @@
 
 namespace App;
 
-use App\Contracts\Controllers\ContainerAware;
+use App\Contracts\Controllers\ContainerAware as ContainerAwareContract;
 use App\Services\Router\Route;
 use App\Services\Router\Router;
 use App\Support\Http\Request;
+use App\Support\Traits\Controller\ContainerAware;
+use App\Support\Traits\Controller\CreateResponse;
+use App\Support\Traits\Controller\RenderView;
 use Aura\Di\ContainerInterface;
 use Aura\Web\Response;
 
@@ -15,13 +18,12 @@ use Aura\Web\Response;
  * @package    App
  * @subpackage App\MasterController
  */
-class MasterController
+class MasterController implements ContainerAwareContract
 {
 
-    /**
-     * @var ContainerInterface
-     */
-    protected $di;
+    use ContainerAware;
+    use CreateResponse;
+    use RenderView;
 
     /**
      * @var Router
@@ -54,7 +56,7 @@ class MasterController
             $controller = $this->di->newInstance($route->getController());
             $args       = $route->getArguments();
 
-            if ($controller instanceof ContainerAware) {
+            if ($controller instanceof ContainerAwareContract) {
                 $controller->setContainer($this->di);
             }
 
@@ -69,8 +71,11 @@ class MasterController
             return $response;
 
         } catch (\Exception $e) {
-            echo $e->getMessage(), '<br />';
-            echo '<pre>', print_r($e->getTraceAsString(), 1), '</pre>';
+            $response = $this->view('errors/error.twig', ['e' => $e]);
+            $response->status->setCode(500);
+            $response->status->setPhrase('Internal Server Error');
+
+            return $response;
         }
     }
 }
