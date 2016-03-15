@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Contracts\Controllers\ContainerAware as ContainerAwareContract;
+use App\Services\Router\NoRouteFoundException;
 use App\Services\Router\Route;
 use App\Services\Router\Router;
 use App\Support\Http\Request;
@@ -69,13 +70,27 @@ class MasterController implements ContainerAwareContract
             }
 
             return $response;
-
+        } catch (NoRouteFoundException $e) {
+            return $this->handleException($e, 404, 'Resource Not Found');
         } catch (\Exception $e) {
-            $response = $this->view('errors/error.twig', ['e' => $e]);
-            $response->status->setCode(500);
-            $response->status->setPhrase('Internal Server Error');
-
-            return $response;
+            return $this->handleException($e);
         }
+    }
+
+    /**
+     * @param \Exception $e
+     * @param int        $status
+     * @param string     $header
+     *
+     * @return Response
+     * @throws \Aura\Web\Exception\InvalidStatusCode
+     */
+    protected function handleException(\Exception $e, $status = 500, $header = 'Internal Server Error')
+    {
+        $response = $this->view('errors/error.twig', ['e' => $e]);
+        $response->status->setCode($status);
+        $response->status->setPhrase($header);
+
+        return $response;
     }
 }
