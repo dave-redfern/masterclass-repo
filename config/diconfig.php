@@ -73,8 +73,8 @@ $di->set('em', $di->lazyNew(App\Services\DB\EntityManager::class, [
  * Router
  */
 $di->params[App\Services\Router\Router::class] = [
-    'config' => $di->lazyGet('config'),
     'resolver' => $di->lazyGet('method_resolver'),
+    'routes'   => $di->lazy(function () { return require_once realpath(__DIR__ . '/../config/routes.php'); }),
 ];
 $di->set('router', $di->lazyNew(App\Services\Router\Router::class));
 

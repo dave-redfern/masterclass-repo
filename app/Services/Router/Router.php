@@ -2,7 +2,6 @@
 
 namespace App\Services\Router;
 
-use App\Services\Config\Config;
 use App\Support\Collection;
 use App\Support\Http\Request;
 use App\Support\MethodTypeHintResolver;
@@ -15,11 +14,6 @@ use App\Support\MethodTypeHintResolver;
  */
 class Router
 {
-
-    /**
-     * @var Config
-     */
-    protected $config;
 
     /**
      * @var MethodTypeHintResolver
@@ -35,25 +29,23 @@ class Router
     /**
      * Constructor.
      *
-     * @param Config                 $config
      * @param MethodTypeHintResolver $resolver
+     * @param array                  $routes
      */
-    public function __construct(Config $config, MethodTypeHintResolver $resolver)
+    public function __construct(MethodTypeHintResolver $resolver, array $routes = [])
     {
-        $this->config   = $config;
         $this->resolver = $resolver;
-
-        $this->parseRoutes($config);
+        $this->parseRoutes($routes);
     }
 
     /**
-     * @param Config $config
+     * @param array $routes
      */
-    protected function parseRoutes(Config $config)
+    protected function parseRoutes(array $routes)
     {
         $this->routes = new Collection();
 
-        foreach ($config->get('routes', []) as $route) {
+        foreach ($routes as $route) {
             $this->routes->add(new Route($route));
         }
     }
