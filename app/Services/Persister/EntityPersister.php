@@ -84,7 +84,9 @@ abstract class EntityPersister implements PersisterInterface
     {
         $this->isValidPersistable($entity);
 
-        return $this->_save($entity);
+        return $this->connection->transaction(function ($conn) use ($entity) {
+            return $this->_save($entity);
+        });
     }
 
     /**
@@ -96,7 +98,9 @@ abstract class EntityPersister implements PersisterInterface
     {
         $this->isValidPersistable($entity);
 
-        return $this->_update($entity);
+        return $this->connection->transaction(function ($conn) use ($entity) {
+            return $this->_update($entity);
+        });
     }
 
     /**
@@ -108,7 +112,9 @@ abstract class EntityPersister implements PersisterInterface
     {
         $this->isValidPersistable($entity);
 
-        return $this->_destroy($entity);
+        return $this->connection->transaction(function ($conn) use ($entity) {
+            return $this->_destroy($entity);
+        });
     }
 
 

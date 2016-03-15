@@ -3,7 +3,6 @@
 namespace App\Services\Repository;
 
 use App\Services\Config\Config;
-use App\Services\DB\Connection;
 use App\Services\DB\EntityManager;
 use App\Services\Persister\PersisterInterface;
 use App\Support\Collection;
