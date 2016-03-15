@@ -6,4 +6,7 @@ require_once('../vendor/autoload.php');
 require_once('../config/diconfig.php');
 
 $framework = new App\MasterController($di, $di->get('router'));
-echo $framework->execute($di->get('request'));
+$response = $framework->execute($di->get('request'));
+
+$response = new \Aura\Web\ResponseSender($response);
+$response();

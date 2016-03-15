@@ -7,6 +7,7 @@ use App\Services\Auth\Authenticator;
 use App\Services\Factory\EntityFactory;
 use App\Support\Http\Request;
 use App\Support\Traits\Controller\Authenticatable;
+use Aura\Web\Response;
 
 /**
  * Class UserController
@@ -44,6 +45,8 @@ class UserController extends BaseController
     /**
      * @param EntityFactory $factory
      * @param Request       $request
+     *
+     * @return Response
      */
     public function create(EntityFactory $factory, Request $request)
     {
@@ -84,28 +87,17 @@ class UserController extends BaseController
 
                 $this->users->getPersister()->save($user);
 
-                $this->redirect('/user/login');
+                return $this->redirect('/user/login');
             }
         }
-        // Show the create form
 
-        $content = '
-            <form method="post">
-                ' . $error . '<br />
-                <label>Username</label> <input type="text" name="username" value="" /><br />
-                <label>Email</label> <input type="text" name="email" value="" /><br />
-                <label>Password</label> <input type="password" name="password" value="" /><br />
-                <label>Password Again</label> <input type="password" name="password_check" value="" /><br />
-                <input type="submit" name="create" value="Create User" />
-            </form>
-        ';
-
-        require __DIR__ . '/../Resources/views/layout.phtml';
-
+        return $this->view('user/create.twig', ['error' => $error]);
     }
 
     /**
      * @param Request $request
+     *
+     * @return Response
      */
     public function account(Request $request)
     {
@@ -128,24 +120,13 @@ class UserController extends BaseController
             }
         }
 
-        $content = '
-        ' . $error . '<br />
-        
-        <label>Username:</label> ' . $user->getUsername() . '<br />
-        <label>Email:</label>' . $user->getEmail() . ' <br />
-        
-         <form method="post">
-                ' . $error . '<br />
-            <label>Password</label> <input type="password" name="password" value="" /><br />
-            <label>Password Again</label> <input type="password" name="password_check" value="" /><br />
-            <input type="submit" name="updatepw" value="Update User" />
-        </form>';
-
-        require __DIR__ . '/../Resources/views/layout.phtml';
+        return $this->view('user/update.twig', ['error' => $error]);
     }
 
     /**
      * @param Request $request
+     *
+     * @return Response
      */
     public function login(Request $request)
     {
@@ -153,31 +134,24 @@ class UserController extends BaseController
 
         if ($request->input('login')) {
             if ($this->auth->attempt($request->input('user'), $request->input('pass'))) {
-                $this->redirect('/');
+                return $this->redirect('/');
             }
 
             $error = 'Your username/password did not match.';
         }
 
-        $content = '
-            <form method="post">
-                ' . $error . '<br />
-                <label>Username</label> <input type="text" name="user" value="" />
-                <label>Password</label> <input type="password" name="pass" value="" />
-                <input type="submit" name="login" value="Log In" />
-            </form>
-        ';
-
-        require __DIR__ . '/../Resources/views/layout.phtml';
+        return $this->view('user/login.twig', ['error' => $error]);
     }
 
     /**
      * Log out the user
+     *
+     * @return Response
      */
     public function logout()
     {
         $this->auth->logout();
 
-        $this->redirect('/');
+        return $this->redirect('/');
     }
 }

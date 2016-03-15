@@ -9,6 +9,7 @@ use App\Services\Auth\Authenticator;
 use App\Services\Factory\EntityFactory;
 use App\Support\Http\Request;
 use App\Support\Traits\Controller\Authenticatable;
+use Aura\Web\Response;
 
 /**
  * Class StoryController
@@ -47,6 +48,8 @@ class StoryController extends BaseController
 
     /**
      * @param Request $request
+     *
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -58,40 +61,20 @@ class StoryController extends BaseController
             $this->redirect('/');
         }
 
-        $comment_count = $this->comments->countForStory($story);
-        $comments      = $this->comments->findForStory($story);
+        $comments = $this->comments->findForStory($story);
+        $story->setCommentCount($comments->count());
 
-        $content = '
-            <a class="headline" href="' . $story->getUrl() . '">' . $story->getHeadline() . '</a><br />
-            <span class="details">' . $story->getCreatedBy() . ' | ' . $comment_count . ' Comments |
-            ' . $story->getCreatedOn()->format('n/j/Y g:i a') . '</span>
-        ';
-
-        if ($this->auth->user()) {
-            $content .= '
-            <form method="post" action="/comment/create">
-            <input type="hidden" name="story_id" value="' . $story->getId() . '" />
-            <textarea cols="60" rows="6" name="comment"></textarea><br />
-            <input type="submit" name="submit" value="Submit Comment" />
-            </form>            
-            ';
-        }
-
-        foreach ($comments as $comment) {
-            $content .= '
-                <div class="comment"><span class="comment_details">' . $comment->getCreatedBy() . ' | ' .
-                        $comment->getCreatedOn()->format('n/j/Y g:i a') . '</span>
-                ' . $comment->getComment() . '</div>
-            ';
-        }
-
-        require __DIR__ . '/../Resources/views/layout.phtml';
-
+        return $this->view('story/show.twig', [
+            'story' => $story,
+            'comments' => $comments,
+        ]);
     }
 
     /**
      * @param EntityFactory $factory
      * @param Request       $request
+     *
+     * @return Response
      */
     public function create(EntityFactory $factory, Request $request)
     {
@@ -109,21 +92,13 @@ class StoryController extends BaseController
 
                 $this->stories->getPersister()->save($story);
 
-                $this->redirect('/story/?id=' . $story->getId());
+                return $this->redirect('/story/?id=' . $story->getId());
             }
         }
 
-        $content = '
-            <form method="post">
-                ' . $error . '<br />
-        
-                <label>Headline:</label> <input type="text" name="headline" value="" /> <br />
-                <label>URL:</label> <input type="text" name="url" value="" /><br />
-                <input type="submit" name="create" value="Create" />
-            </form>
-        ';
-
-        require __DIR__ . '/../Resources/views/layout.phtml';
+        return $this->view('story/create.twig', [
+            'error' => $error,
+        ]);
     }
 
 }

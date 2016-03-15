@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Repositories\CommentRepository;
 use App\Repositories\StoryRepository;
+use Aura\Web\Response;
 
 /**
  * Class IndexController
@@ -37,29 +38,13 @@ class IndexController extends BaseController
     }
 
     /**
-     * @return void
+     * @return Response
      */
     public function index()
     {
-        $stories = $this->stories->findBy([], ['created_on' => 'DESC']);
+        $stories = $this->stories->findStoriesWithCommentCounts();
 
-        $content = '<ol>';
-
-        foreach ($stories as $story) {
-            $count = $this->comments->countForStory($story);
-
-            $content .= '
-                <li>
-                <a class="headline" href="' . $story->getUrl() . '">' . $story->getHeadline() . '</a><br />
-                <span class="details">' . $story->getCreatedBy() . ' | <a href="/story/?id=' . $story->getId() . '">' . $count . ' Comments</a> |
-                ' . $story->getCreatedOn()->format('n/j/Y g:i a') . '</span>
-                </li>
-            ';
-        }
-
-        $content .= '</ol>';
-
-        require __DIR__ . '/../Resources/views/layout.phtml';
+        return $this->view('index/index.twig', ['stories' => $stories]);
     }
 }
 

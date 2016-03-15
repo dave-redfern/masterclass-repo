@@ -1,0 +1,19 @@
+{% extends 'layouts/layout.twig' %}
+
+{% block content %}
+
+    {% include 'story/_story_summary.twig' with {story: story} %}
+
+    {% if current_user %}
+        <form method="post" action="/comment/create">
+            <input type="hidden" name="story_id" value="{{ story.id }}" />
+            <textarea cols="60" rows="6" name="comment"></textarea><br />
+            <input type="submit" name="submit" value="Submit Comment" />
+        </form>
+    {% endif %}
+
+    {% for comment in comments %}
+        {% include 'comment/_comment_details.twig' with {comment: comment} %}
+    {% endfor %}
+
+{% endblock %}

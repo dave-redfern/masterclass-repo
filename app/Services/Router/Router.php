@@ -61,7 +61,8 @@ class Router
     /**
      * @param Request $request
      *
-     * @return Route|null
+     * @return Route
+     * @throws NoRouteFoundException
      */
     public function route(Request $request)
     {
@@ -78,6 +79,6 @@ class Router
             }
         }
 
-        return null;
+        throw new NoRouteFoundException($requestType, $requestPath);
     }
 }

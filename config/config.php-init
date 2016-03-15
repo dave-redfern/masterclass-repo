@@ -26,9 +26,25 @@ return array(
         ['path' => '/user/logout',    'type' => 'GET',  'handler' => $namespace . 'UserController@logout'],
     ],
 
+    'twig' => [
+        'options' => [
+            'auto_reload' => true,
+            'cache'       => realpath(__DIR__ . '/../tmp/twig'),
+        ],
+        'templates'   => [
+            realpath(__DIR__ . '/../app/Resources/views'),
+        ],
+    ],
+
     'mappings' => [
         App\Entities\Comment::class => 'comment',
         App\Entities\Story::class   => 'story',
         App\Entities\User::class    => 'user',
+    ],
+
+    'repositories' => [
+        App\Entities\Comment::class => App\Repositories\CommentRepository::class,
+        App\Entities\Story::class   => App\Repositories\StoryRepository::class,
+        App\Entities\User::class    => App\Repositories\UserRepository::class,
     ],
 );

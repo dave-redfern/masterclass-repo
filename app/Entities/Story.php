@@ -26,6 +26,11 @@ class Story implements TrackableContract
      */
     protected $url;
 
+    /**
+     * @var integer
+     */
+    protected $commentCount = 0;
+
 
 
     /**
@@ -33,6 +38,8 @@ class Story implements TrackableContract
      *
      * @param string $headline
      * @param string $url
+     * @param string $createdBy
+     * @param string $createdOn (string or DateTime)
      */
     public function __construct($headline = null, $url = null, $createdBy = null, $createdOn = null)
     {
@@ -78,6 +85,26 @@ class Story implements TrackableContract
     public function setUrl($url)
     {
         $this->url = $url;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCommentCount()
+    {
+        return $this->commentCount;
+    }
+
+    /**
+     * @param int $commentCount
+     *
+     * @return $this
+     */
+    public function setCommentCount($commentCount)
+    {
+        $this->commentCount = $commentCount;
 
         return $this;
     }

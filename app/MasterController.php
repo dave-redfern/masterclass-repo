@@ -2,10 +2,12 @@
 
 namespace App;
 
+use App\Contracts\Controllers\ContainerAware;
 use App\Services\Router\Route;
 use App\Services\Router\Router;
 use App\Support\Http\Request;
 use Aura\Di\ContainerInterface;
+use Aura\Web\Response;
 
 /**
  * Class MasterController
@@ -41,7 +43,7 @@ class MasterController
     /**
      * @param Request $request
      *
-     * @return string
+     * @return Response
      */
     public function execute(Request $request)
     {
@@ -49,14 +51,22 @@ class MasterController
             /** @var Route $route */
             $route = $this->router->route($request);
 
-            if ($route) {
-                $controller = $this->di->newInstance($route->getController());
-                $args       = $route->getArguments();
+            $controller = $this->di->newInstance($route->getController());
+            $args       = $route->getArguments();
 
-                return call_user_func_array([$controller, $route->getMethod()], $args);
-            } else {
-                throw new \RuntimeException('No route defined');
+            if ($controller instanceof ContainerAware) {
+                $controller->setContainer($this->di);
             }
+
+            $response = call_user_func_array([$controller, $route->getMethod()], $args);
+
+            if (!$response instanceof Response) {
+                throw new \RuntimeException(
+                    sprintf('%s::%s did not return a response object', $route->getController(), $route->getMethod())
+                );
+            }
+
+            return $response;
 
         } catch (\Exception $e) {
             echo $e->getMessage(), '<br />';

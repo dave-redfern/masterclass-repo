@@ -1,0 +1,14 @@
+{% extends 'layouts/layout.twig' %}
+
+{% block content %}
+    <form method="post">
+        {{ error }}<br />
+
+        <label>Username:</label> {{ current_user.username }}<br />
+        <label>Email:</label> {{ current_user.email }} <br />
+
+        <label>Password</label> <input type="password" name="password" value="" /><br />
+        <label>Password Again</label> <input type="password" name="password_check" value="" /><br />
+        <input type="submit" name="updatepw" value="Update Password" />
+    </form>
+{% endblock %}

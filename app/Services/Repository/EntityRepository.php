@@ -4,6 +4,7 @@ namespace App\Services\Repository;
 
 use App\Services\Config\Config;
 use App\Services\DB\Connection;
+use App\Services\DB\EntityManager;
 use App\Services\Persister\PersisterInterface;
 use App\Support\Collection;
 use PDO;
@@ -18,9 +19,9 @@ abstract class EntityRepository implements RepositoryInterface
 {
 
     /**
-     * @var Connection
+     * @var EntityManager
      */
-    protected $connection;
+    protected $em;
 
     /**
      * @var PersisterInterface
@@ -42,14 +43,14 @@ abstract class EntityRepository implements RepositoryInterface
     /**
      * Constructor.
      *
-     * @param Connection         $connection
+     * @param EntityManager      $em
      * @param PersisterInterface $persister
      * @param Config             $config
-     * @param                    $entity
+     * @param string             $entity
      */
-    public function __construct(Connection $connection, PersisterInterface $persister, Config $config, $entity)
+    public function __construct(EntityManager $em, PersisterInterface $persister, Config $config, $entity)
     {
-        $this->connection = $connection;
+        $this->em         = $em;
         $this->persister  = $persister;
         $this->config     = $config;
         $this->entityName = $entity;
@@ -96,7 +97,7 @@ abstract class EntityRepository implements RepositoryInterface
             $query .= ' WHERE ' . implode(' AND ', $whereSql);
         }
 
-        $stmt = $this->connection->prepare($query);
+        $stmt = $this->em->getConnection()->prepare($query);
         $stmt->execute($parameters);
 
         return $stmt->fetchColumn();
@@ -111,7 +112,7 @@ abstract class EntityRepository implements RepositoryInterface
      */
     public function find($id)
     {
-        $stmt = $this->connection->prepare(
+        $stmt = $this->em->getConnection()->prepare(
             sprintf(
                 'SELECT * FROM %s WHERE id = :id LIMIT 1',
                 $this->getMappedTable()
@@ -135,7 +136,7 @@ abstract class EntityRepository implements RepositoryInterface
      */
     public function findAll()
     {
-        $stmt = $this->connection->prepare(
+        $stmt = $this->em->getConnection()->prepare(
             sprintf('SELECT * FROM %s', $this->getMappedTable())
         );
         $stmt->execute();
@@ -189,7 +190,7 @@ abstract class EntityRepository implements RepositoryInterface
             $query .= sprintf(' LIMIT %d', $limit);
         }
 
-        $stmt = $this->connection->prepare($query);
+        $stmt = $this->em->getConnection()->prepare($query);
         $stmt->execute($parameters);
 
         $results = $stmt->fetchAll(PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE, $this->getEntityName());
@@ -218,5 +219,23 @@ abstract class EntityRepository implements RepositoryInterface
     protected function getMappedTable()
     {
         return $this->config->get('mappings')[$this->getEntityName()];
+    }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getEntityManager()
+    {
+        return $this->em;
+    }
+
+    /**
+     * @param string $class
+     *
+     * @return RepositoryInterface
+     */
+    protected function getRepository($class)
+    {
+        return $this->em->getRepository($class);
     }
 }

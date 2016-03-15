@@ -9,6 +9,7 @@ use App\Services\Auth\Authenticator;
 use App\Services\Factory\EntityFactory;
 use App\Support\Http\Request;
 use App\Support\Traits\Controller\Authenticatable;
+use Aura\Web\Response;
 
 /**
  * Class CommentController
@@ -54,7 +55,7 @@ class CommentController extends BaseController
      * @param EntityFactory $factory
      * @param Request       $request
      *
-     * @return void
+     * @return Response
      */
     public function create(EntityFactory $factory, Request $request)
     {
@@ -72,6 +73,6 @@ class CommentController extends BaseController
 
         $this->comments->getPersister()->save($comment);
 
-        $this->redirect('/story/?id=' . $story->getId());
+        return $this->redirect('/story/?id=' . $story->getId());
     }
 }

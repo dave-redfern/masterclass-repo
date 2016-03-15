@@ -1,0 +1,8 @@
+<a class="headline" href="{{ story.url }}">{{ story.headline }}</a>
+<br />
+
+<span class="details">
+    {{ story.createdBy }} |
+    <a href="/story/?id={{ story.id }}">{{ story.commentCount }} Comments</a> |
+    {{ story.createdOn.format('n/j/Y g:i a') }}
+</span>
