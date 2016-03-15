@@ -79,8 +79,6 @@ class StoryController extends BaseController
      */
     public function create(EntityFactory $factory, Request $request)
     {
-        $this->isAuthenticated();
-
         $errors = [];
 
         if ($request->input('create')) {

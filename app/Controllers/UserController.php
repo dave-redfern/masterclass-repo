@@ -88,8 +88,6 @@ class UserController extends BaseController
      */
     public function account(Request $request)
     {
-        $this->isAuthenticated('/user/login');
-
         $user    = $this->auth->user();
         $success = null;
         $errors  = [];

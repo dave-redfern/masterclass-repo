@@ -145,6 +145,17 @@ class Request
     }
 
     /**
+     * @return array
+     */
+    public function getRequestArguments()
+    {
+        $args = [];
+        parse_str(parse_url($this->getRequestUri(), PHP_URL_QUERY), $args);
+
+        return $args;
+    }
+
+    /**
      * Checks in Query and Request for $name, returning default if not found
      *
      * @param string $name

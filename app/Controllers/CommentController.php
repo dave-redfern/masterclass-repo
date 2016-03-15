@@ -60,13 +60,12 @@ class CommentController extends BaseController
      */
     public function create(EntityFactory $factory, Request $request)
     {
-        $this->isAuthenticated();
-
         /** @var Story $story */
         if (null === $story = $this->stories->find($request->input('story_id'))) {
             return $this->redirect('/');
         }
 
+        $story->setCommentCount($this->comments->countForStory($story));
         $comment   = $factory->createComment($story, $request->input('comment'));
         /** @var Validator $validator */
         $validator = $this->get('validator');

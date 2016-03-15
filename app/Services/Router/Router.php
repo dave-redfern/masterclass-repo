@@ -58,13 +58,14 @@ class Router
      */
     public function route(Request $request)
     {
-        $requestPath  = $request->getRequestPath();
-        $requestType  = $request->getRequestMethod();
+        $requestPath = $request->getRequestPath();
+        $requestType = $request->getRequestMethod();
+        $requestArgs = $request->getRequestArguments();
 
         foreach ($this->routes as $route) {
             if ($route->matches($requestType, $requestPath)) {
                 $route->setArguments(
-                    $this->resolver->resolveArguments($route->getController(), $route->getMethod())
+                    $this->resolver->resolveArguments($route->getController(), $route->getMethod(), $requestArgs)
                 );
 
                 return $route;

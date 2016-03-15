@@ -54,6 +54,12 @@ class MasterController implements ContainerAwareContract
             /** @var Route $route */
             $route = $this->router->route($request);
 
+            if ($route->getAuth()) {
+                if (true !== $response = $this->di->get('http_auth')->authorize()) {
+                    return $response;
+                }
+            }
+
             $controller = $this->di->newInstance($route->getController());
             $args       = $route->getArguments();
 

@@ -77,6 +77,14 @@ class Route extends Collection
     }
 
     /**
+     * @return boolean
+     */
+    public function getAuth()
+    {
+        return $this->get('auth', false);
+    }
+
+    /**
      * @param array $args
      *
      * @return $this

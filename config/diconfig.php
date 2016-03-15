@@ -128,6 +128,11 @@ $di->set(App\Services\Auth\Authenticator::class, $di->lazyNew(App\Services\Auth\
     $di->lazyGet(App\Repositories\UserRepository::class),
     $di->lazyGet('request'),
 ]));
+$di->set('authenticator', $di->lazyGet(App\Services\Auth\Authenticator::class));
+$di->set('http_auth', $di->lazyNew(App\Support\Http\Auth::class, [
+    $di->lazyGet('authenticator'),
+    $di->lazyGet('request_factory'),
+]));
 
 /*
  * View Engine
