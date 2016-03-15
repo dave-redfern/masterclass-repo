@@ -36,7 +36,25 @@ $di->set('request', $di->lazy(function () {
 $di->set('response', $di->lazy(function () use ($di) {
     return $di->get('request_factory')->newResponse();
 }));
+
+/*
+ * Validation / filtering
+ */
 $di->set(App\Support\Http\Request::class, $di->lazyGet('request'));
+$di->set('filter_factory', $di->lazy(function () use ($di) {
+    $filters = new Aura\Filter\FilterFactory([
+        'uniqueUsername' => function () use ($di) { return $di->get('validate_unique_username'); },
+    ]);
+
+    return $filters;
+}));
+$di->set('validator', $di->lazyNew(App\Services\Validation\Validator::class, [
+    $di->lazyGet('filter_factory'),
+    $di->lazyGet('config'),
+]));
+$di->set('validate_unique_username', $di->lazyNew(App\Services\Validation\Filters\UniqueUsername::class, [
+    $di->lazyGet(App\Repositories\UserRepository::class),
+]));
 
 /*
  * Db Connection

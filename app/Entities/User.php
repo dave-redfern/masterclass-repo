@@ -31,6 +31,11 @@ class User implements IdentifiableContract
      */
     protected $password;
 
+    /**
+     * @var string
+     */
+    protected $password_check;
+
 
 
     /**
@@ -103,6 +108,26 @@ class User implements IdentifiableContract
     public function setPassword($password)
     {
         $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPasswordCheck()
+    {
+        return $this->password_check;
+    }
+
+    /**
+     * @param string $password_check
+     *
+     * @return $this
+     */
+    public function setPasswordCheck($password_check)
+    {
+        $this->password_check = $password_check;
 
         return $this;
     }

@@ -47,4 +47,10 @@ return array(
         App\Entities\Story::class   => App\Repositories\StoryRepository::class,
         App\Entities\User::class    => App\Repositories\UserRepository::class,
     ],
+
+    'validators' => [
+        App\Entities\Comment::class => App\Services\Validation\CommentValidator::class,
+        App\Entities\Story::class   => App\Services\Validation\StoryValidator::class,
+        App\Entities\User::class    => App\Services\Validation\UserValidator::class,
+    ],
 );

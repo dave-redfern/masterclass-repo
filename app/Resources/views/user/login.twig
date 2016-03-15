@@ -1,9 +1,9 @@
 {% extends 'layouts/layout.twig' %}
 
 {% block content %}
-    <form method="post">
-        {{ error }}<br />
+    {% include '_partials/errors.twig' with {error: error} %}
 
+    <form method="post">
         <label>Username</label> <input type="text" name="user" value="" />
         <label>Password</label> <input type="password" name="pass" value="" />
         <input type="submit" name="login" value="Log In" />

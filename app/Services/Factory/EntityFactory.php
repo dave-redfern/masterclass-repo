@@ -73,7 +73,7 @@ class EntityFactory
      */
     public function createUser($username = null, $email = null, $password = null)
     {
-        $entity = new User($username, $email, password_hash($password, PASSWORD_BCRYPT));
+        $entity = new User($username, $email, $password);
 
         $this->applyCreator($entity);
 

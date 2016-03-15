@@ -3,6 +3,7 @@
 namespace App\Support\Traits\Controller;
 
 use App\Services\Auth\Authenticator;
+use Aura\Web\Response;
 
 /**
  * Trait Authenticatable
@@ -23,12 +24,12 @@ trait Authenticatable
      *
      * @param string $redirect
      *
-     * @return boolean
+     * @return boolean|Response
      */
     public function isAuthenticated($redirect = '/')
     {
         if (!$this->auth->user()) {
-            $this->redirect($redirect);
+            return $this->redirect($redirect);
         }
 
         return true;

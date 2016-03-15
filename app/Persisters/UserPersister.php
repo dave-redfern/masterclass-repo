@@ -28,6 +28,8 @@ class UserPersister extends EntityPersister
                 (:username, :email, :password)
         ', $this->getMappedTable());
 
+        $this->ensurePasswordIsHashed($entity);
+
         $stmt = $this->connection->prepare($sql);
         $res  = $stmt->execute([
             ':username' => $entity->getUsername(),
@@ -54,6 +56,8 @@ class UserPersister extends EntityPersister
                    password = :password
              WHERE id = :id
         ', $this->getMappedTable());
+
+        $this->ensurePasswordIsHashed($entity);
 
         $stmt = $this->connection->prepare($sql);
 
@@ -82,5 +86,15 @@ class UserPersister extends EntityPersister
         return $stmt->execute([
             ':id' => $entity->getId(),
         ]);
+    }
+
+    /**
+     * @param User $entity
+     */
+    protected function ensurePasswordIsHashed(User $entity)
+    {
+        if (password_needs_rehash($entity->getPassword(), PASSWORD_BCRYPT)) {
+            $entity->setPassword(password_hash($entity->getPassword(), PASSWORD_BCRYPT));
+        }
     }
 }

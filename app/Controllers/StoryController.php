@@ -7,6 +7,7 @@ use App\Repositories\CommentRepository;
 use App\Repositories\StoryRepository;
 use App\Services\Auth\Authenticator;
 use App\Services\Factory\EntityFactory;
+use App\Services\Validation\Validator;
 use App\Support\Http\Request;
 use App\Support\Traits\Controller\Authenticatable;
 use Aura\Web\Response;
@@ -80,24 +81,24 @@ class StoryController extends BaseController
     {
         $this->isAuthenticated();
 
-        $error = '';
+        $errors = [];
 
         if ($request->input('create')) {
-            if (!$request->input('headline') || !$request->input('url') ||
-                !filter_var($request->input('url'), FILTER_VALIDATE_URL)
-            ) {
-                $error = 'You did not fill in all the fields or the URL did not validate.';
-            } else {
-                $story = $factory->createStory($request->input('headline'), $request->input('url'));
+            $story     = $factory->createStory($request->input('headline'), $request->input('url'));
+            /** @var Validator $validator */
+            $validator = $this->get('validator');
 
+            if ($validator->validate($story)) {
                 $this->stories->getPersister()->save($story);
 
                 return $this->redirect('/story/?id=' . $story->getId());
             }
+
+            $errors = $validator->getFailures()->getMessages();
         }
 
         return $this->view('story/create.twig', [
-            'error' => $error,
+            'errors' => $errors,
         ]);
     }
 

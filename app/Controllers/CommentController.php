@@ -7,6 +7,7 @@ use App\Repositories\CommentRepository;
 use App\Repositories\StoryRepository;
 use App\Services\Auth\Authenticator;
 use App\Services\Factory\EntityFactory;
+use App\Services\Validation\Validator;
 use App\Support\Http\Request;
 use App\Support\Traits\Controller\Authenticatable;
 use Aura\Web\Response;
@@ -65,14 +66,20 @@ class CommentController extends BaseController
         if (null === $story = $this->stories->find($request->input('story_id'))) {
             $this->redirect('/');
         }
-        if (!$request->input('comment')) {
-            $this->redirect('/story/?id=' . $story->getId());
+
+        $comment   = $factory->createComment($story, $request->input('comment'));
+        /** @var Validator $validator */
+        $validator = $this->get('validator');
+
+        if ($validator->validate($comment)) {
+            $this->comments->getPersister()->save($comment);
+
+            return $this->redirect('/story/?id=' . $story->getId());
         }
 
-        $comment = $factory->createComment($story, $request->input('comment'));
-
-        $this->comments->getPersister()->save($comment);
-
-        return $this->redirect('/story/?id=' . $story->getId());
+        return $this->view('comment/create.twig', [
+            'story' => $story,
+            'error' => $validator->getFailures()->getMessagesForFieldAsString('comment'),
+        ]);
     }
 }

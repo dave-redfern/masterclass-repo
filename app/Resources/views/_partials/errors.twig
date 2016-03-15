@@ -1,0 +1,12 @@
+{% if errors|length > 0 %}
+    <p><strong>Oops!</strong></p>
+    <ul>
+        {% for field,error in errors %}
+            <li>{{ field|capitalize }}: {{ error.0 }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+{% if error %}
+    <p><strong>Oops:</strong> {{ error }}</p>
+{% endif %}

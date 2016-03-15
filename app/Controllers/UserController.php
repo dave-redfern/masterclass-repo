@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Repositories\UserRepository;
 use App\Services\Auth\Authenticator;
 use App\Services\Factory\EntityFactory;
+use App\Services\Validation\Validator;
 use App\Support\Http\Request;
 use App\Support\Traits\Controller\Authenticatable;
 use Aura\Web\Response;
@@ -50,48 +51,34 @@ class UserController extends BaseController
      */
     public function create(EntityFactory $factory, Request $request)
     {
-        $error = null;
+        $user   = $factory->createUser();
+        $errors = [];
 
         // Do the create
         if ($request->input('create')) {
-            if (!$request->input('username') || !$request->input('email') ||
-                !$request->input('password') || !$request->input('password_check')
-            ) {
-                $error = 'You did not fill in all required fields.';
-            }
+            /** @var Validator $validator */
+            $validator = $this->get('validator');
 
-            if (is_null($error)) {
-                if (!filter_var($request->input('email'), FILTER_VALIDATE_EMAIL)) {
-                    $error = 'Your email address is invalid';
-                }
-            }
+            $user
+                ->setUsername($request->input('username'))
+                ->setEmail($request->input('email'))
+                ->setPassword($request->input('password'))
+                ->setPasswordCheck($request->input('password_check'))
+            ;
 
-            if (is_null($error)) {
-                if ($request->input('password') != $request->input('password_check')) {
-                    $error = "Your passwords didn't match.";
-                }
-            }
-
-            if (is_null($error)) {
-                if (null !== $this->users->findByUsername($request->input('username'))) {
-                    $error = 'Your chosen username already exists. Please choose another.';
-                }
-            }
-
-            if (is_null($error)) {
-                $user = $factory->createUser(
-                    $request->input('username'),
-                    $request->input('email'),
-                    $request->input('password')
-                );
-
+            if ($validator->validate($user)) {
                 $this->users->getPersister()->save($user);
 
                 return $this->redirect('/user/login');
             }
+
+            $errors = $validator->getFailures()->getMessages();
         }
 
-        return $this->view('user/create.twig', ['error' => $error]);
+        return $this->view('user/create.twig', [
+            'errors' => $errors,
+            'user'   => $user,
+        ]);
     }
 
     /**
@@ -103,24 +90,31 @@ class UserController extends BaseController
     {
         $this->isAuthenticated('/user/login');
 
-        $user  = $this->auth->user();
-        $error = null;
+        $user    = $this->auth->user();
+        $success = null;
+        $errors  = [];
 
         if ($request->input('updatepw')) {
-            if (!$request->input('password') || !$request->input('password_check') ||
-                $request->input('password') != $request->input('password_check')
-            ) {
-                $error = 'The password fields were blank or they did not match. Please try again.';
-            } else {
-                $user->setPassword(password_hash($request->input('password'), PASSWORD_BCRYPT));
+            /** @var Validator $validator */
+            $validator = $this->get('validator');
 
-                $this->users->getPersister()->update($user);
+            $user
+                ->setPassword($request->input('password'))
+                ->setPasswordCheck($request->input('password_check'))
+            ;
 
-                $error = 'Your password was changed.';
+            if (!$validator->validate($user)) {
+                $errors = $validator->getFailures()->getMessages();
             }
+
+            $this->users->getPersister()->update($user);
+            $success = 'Your password was changed.';
         }
 
-        return $this->view('user/update.twig', ['error' => $error]);
+        return $this->view('user/update.twig', [
+            'errors'  => $errors,
+            'success' => $success,
+        ]);
     }
 
     /**
